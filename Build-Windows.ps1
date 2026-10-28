@@ -1,9 +1,11 @@
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+Write-Host 'Downloading and verifying EasyFace compiler...'
 Set-Location $PSScriptRoot
 $projectDir = Join-Path $PSScriptRoot 'DaiCaMinimal'
 $compilerDir = Join-Path $PSScriptRoot 'compiler'
 $archive = Join-Path $PSScriptRoot 'compiler.zip'
-Invoke-WebRequest -Uri 'https://github.com/m0tral/EasyFace/releases/download/v4.23/EasyFace_Gen2_CompilerV423.zip' -OutFile $archive
+Invoke-WebRequest -Uri 'https://github.com/m0tral/EasyFace/releases/download/v4.23/EasyFace_Gen2_CompilerV423.zip' -OutFile $archive -TimeoutSec 120
 $expected = '5b62773369c10c3402f369e8aa579f13393af359d0214c0d979464e5cc776cef'
 if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) { throw 'Compiler download checksum mismatch.' }
 Expand-Archive -LiteralPath $archive -DestinationPath $compilerDir -Force
@@ -11,6 +13,7 @@ $outDir = Join-Path $projectDir 'output'
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 $target = Join-Path $outDir 'DaiCaMinimal.bin'
 if (Test-Path $target) { Remove-Item $target }
+Write-Host 'Starting watchface compiler...'
 $log = & (Join-Path $compilerDir 'Compiler.exe') -b (Join-Path $projectDir 'DaiCaMinimal.fprj') $outDir 'DaiCaMinimal.bin' '1461256429' 2>&1
 $compilerExit = $LASTEXITCODE
 $log | Out-Host
