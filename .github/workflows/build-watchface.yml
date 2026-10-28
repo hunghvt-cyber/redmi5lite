@@ -1,0 +1,40 @@
+name: Build Redmi Watch 5 Lite
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/**'
+      - 'Build-Windows.ps1'
+      - '.github/workflows/build-watchface.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract watchface project
+        shell: pwsh
+        run: |
+          $data = (Get-Content assets/watchface.zip.b64 -Raw).Trim()
+          [IO.File]::WriteAllBytes("$PWD/watchface.zip", [Convert]::FromBase64String($data))
+          Expand-Archive watchface.zip -DestinationPath . -Force
+      - name: Compile for Redmi Watch 5 Lite
+        shell: powershell
+        run: ./Build-Windows.ps1
+      - name: Upload installable watchface
+        uses: actions/upload-artifact@v4
+        with:
+          name: DaiCaMinimal-Redmi5Lite
+          path: DaiCaMinimal/output/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-diagnostics
+          path: DaiCaMinimal/output/
+          if-no-files-found: ignore
