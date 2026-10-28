@@ -1,3 +1,7 @@
+## V4 update
+
+The right column now uses T2-T7/CN, day above month with a short horizontal divider, and battery percentage below. The large time and all AOD PNGs are unchanged from V3. ID: `928105004`. Download artifact `DaiCaMinimal-Stacked-v4-AOD`. Source generator: `design/build_v4.py`.
+
 # Dai Ca Minimal — Redmi Watch 5 Lite
 
 For **Redmi Watch 5 Lite only**, 410 × 502 pixels.
