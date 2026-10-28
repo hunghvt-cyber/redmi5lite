@@ -2,22 +2,23 @@
 
 For **Redmi Watch 5 Lite only**, 410 × 502 pixels.
 
-## v2
+## V3: Stacked 12-hour + outline AOD
 
-- 12-hour time with a small AM/PM label, derived from the 24-hour clock source.
-- Larger white digits on black.
-- Centered battery percentage and battery icon above time.
-- Vietnamese weekday and DD/MM date below.
-- Watchface ID `928105002`; original v1 used `928105001`.
+- Large hour and minute in two rows, Barlow Condensed Bold at its natural proportions.
+- 12-hour clock without AM/PM, as requested.
+- Right column: Vietnamese weekday, DD/MM and battery percentage. No icons or weather.
+- Separate AOD project: only hour/minute outlines, black background, no seconds, animation, or other information.
+- AOD maximum nonblack pixel area over all 720 12-hour/minute combinations: 3.55%. This is a design metric, not a battery-life measurement.
+- ID `928105003`; v1 `928105001`; v2 `928105002`.
 
-Build succeeds on Windows using GitHub Actions. Download `DaiCaMinimal-12h-v2` from the latest successful workflow run, extract it and install `DaiCaMinimal.bin` through an already connected Gadgetbridge on Android.
+Download `DaiCaMinimal-Stacked-v3-AOD` from the successful Windows workflow run, extract and install `DaiCaMinimal.bin` using an already connected Gadgetbridge on Android. Enable Always-on display in the watch's Display settings to test the included AOD layout. Real-device verification is still required for V3 and its AOD.
 
-The original v1 was confirmed working on the user's watch. v2 is compiled and structurally checked, but still needs a physical-watch test.
+## Sources
 
-## Editing
+`assets/watchface.zip.b64`: complete FPRJ and indexed-PNG assets, including `AOD/AOD.fprj`.
 
-The normal watchface format used here does not provide an on-watch Edit panel. v2 does not add one. Different IDs let the watch distinguish v1 and v2; whether both remain installed depends on available watch storage and installer behavior.
+Reproduce V3 with Pillow installed: `python design/build_v3.py`. The Barlow Condensed font and its SIL Open Font License are in `design/fonts/`.
 
-`assets/watchface.zip.b64` contains the editable FPRJ and PNG assets. Open the decoded project in Mi Create/EasyFace to modify it. `design/build_v2.py` reproduces the art and project using Pillow and DejaVu Sans Bold (`--font` can point to another font file). No auth keys or device-specific credentials are needed to build.
+This build does not add an on-watch Edit panel. Different IDs let the watch distinguish versions; retention depends on watch storage and installer behavior.
 
 Tools: [EasyFace](https://github.com/m0tral/EasyFace), [Mi Create](https://github.com/ooflet/Mi-Create), [Gadgetbridge](https://gadgetbridge.org/).
