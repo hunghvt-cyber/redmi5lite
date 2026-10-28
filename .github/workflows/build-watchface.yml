@@ -27,7 +27,7 @@ jobs:
       - name: Upload installable watchface
         uses: actions/upload-artifact@v4
         with:
-          name: DaiCaMinimal-Redmi5Lite
+          name: DaiCaMinimal-12h-v2
           path: DaiCaMinimal/output/
           if-no-files-found: error
           retention-days: 30
