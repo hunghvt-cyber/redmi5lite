@@ -14,11 +14,31 @@ New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 $target = Join-Path $outDir 'DaiCaMinimal.bin'
 if (Test-Path $target) { Remove-Item $target }
 Write-Host 'Starting watchface compiler...'
-$log = & (Join-Path $compilerDir 'Compiler.exe') -b (Join-Path $projectDir 'DaiCaMinimal.fprj') $outDir 'DaiCaMinimal.bin' '1461256429' 2>&1
-$compilerExit = $LASTEXITCODE
+$stdout = Join-Path $outDir 'compiler-stdout.txt'
+$stderr = Join-Path $outDir 'compiler-stderr.txt'
+$arguments = '-b "{0}" "{1}" "DaiCaMinimal.bin" "1461256429"' -f (Join-Path $projectDir 'DaiCaMinimal.fprj'), $outDir
+$p = Start-Process -FilePath (Join-Path $compilerDir 'Compiler.exe') -WorkingDirectory $compilerDir -ArgumentList $arguments -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+if (!$p.WaitForExit(60000)) {
+    Get-Process | Where-Object { $_.MainWindowTitle } | Select-Object Name, Id, MainWindowTitle | Out-File (Join-Path $outDir 'windows.txt')
+    try {
+        Add-Type -AssemblyName System.Windows.Forms
+        Add-Type -AssemblyName System.Drawing
+        $bounds = [System.Windows.Forms.SystemInformation]::VirtualScreen
+        $bmp = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+        $g = [System.Drawing.Graphics]::FromImage($bmp)
+        $g.CopyFromScreen($bounds.Left, $bounds.Top, 0, 0, $bmp.Size)
+        $bmp.Save((Join-Path $outDir 'compiler-screen.png'))
+        $g.Dispose(); $bmp.Dispose()
+    } catch { Write-Host $_ }
+    Stop-Process -Id $p.Id -Force
+    Get-Content $stdout, $stderr | Tee-Object -FilePath (Join-Path $outDir 'build-log.txt')
+    throw 'Compiler timed out after 60 seconds. See diagnostics.'
+}
+$p.WaitForExit()
+$log = Get-Content $stdout, $stderr
 $log | Out-Host
 $log | Out-File (Join-Path $outDir 'build-log.txt') -Encoding utf8
-if ($compilerExit -ne 0 -or !(Test-Path $target) -or (($log -join "`n") -match 'Error:')) { throw 'Compiler failed. See build-log.txt.' }
+if ($p.ExitCode -ne 0 -or !(Test-Path $target) -or (($log -join "`n") -match 'Error:')) { throw 'Compiler failed. See build-log.txt.' }
 $bytes = [IO.File]::ReadAllBytes($target)
 if ($bytes.Length -lt 100) { throw 'Output is too small.' }
 # Match Mi Create ID assignment after compiler output.
