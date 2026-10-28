@@ -38,7 +38,7 @@ $p.WaitForExit()
 $log = Get-Content $stdout, $stderr
 $log | Out-Host
 $log | Out-File (Join-Path $outDir 'build-log.txt') -Encoding utf8
-if ($p.ExitCode -ne 0 -or !(Test-Path $target) -or (($log -join "`n") -match 'Error:')) { throw 'Compiler failed. See build-log.txt.' }
+if (!(Test-Path $target) -or (($log -join "`n") -match 'Error:') -or (($log -join "`n") -notmatch 'No Errors')) { throw 'Compiler failed. See build-log.txt.' }
 $bytes = [IO.File]::ReadAllBytes($target)
 if ($bytes.Length -lt 100) { throw 'Output is too small.' }
 # Match Mi Create ID assignment after compiler output.
