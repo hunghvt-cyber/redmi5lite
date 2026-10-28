@@ -42,14 +42,15 @@ if (!(Test-Path $target) -or (($log -join "`n") -match 'Error:') -or (($log -joi
 $bytes = [IO.File]::ReadAllBytes($target)
 if ($bytes.Length -lt 100) { throw 'Output is too small.' }
 # Match Mi Create ID assignment after compiler output.
-$id = [Text.Encoding]::ASCII.GetBytes('928105002')
+$id = [Text.Encoding]::ASCII.GetBytes('928105003')
 [Array]::Copy($id, 0, $bytes, 40, 9)
 [IO.File]::WriteAllBytes($target, $bytes)
 Get-FileHash $target -Algorithm SHA256 | Format-List | Out-String | Set-Content (Join-Path $outDir 'SHA256.txt')
 Copy-Item (Join-Path $projectDir 'preview-full.png') $outDir
+Copy-Item (Join-Path $projectDir 'AOD/preview-full.png') (Join-Path $outDir 'preview-aod.png')
 @'
 Dai Ca Minimal — Redmi Watch 5 Lite ONLY (410 x 502)
-12-hour time with AM/PM, larger digits, battery percentage, Vietnamese weekday and DD/MM date.
+Stacked 12-hour time, no AM/PM or icons. Vietnamese weekday, DD/MM and battery percentage. Outline-only AOD.
 Install DaiCaMinimal.bin through an already-paired Gadgetbridge on Android.
 Compiled successfully on Windows; physical-watch behavior has not been tested.
 '@ | Set-Content (Join-Path $outDir 'READ-ME.txt') -Encoding utf8
