@@ -39,11 +39,11 @@ def project(aod=False):
  num('Minutes',x,250,cw*2,ch,'1011','digit')
  if not aod:
   for n in range(10):save(text(str(n),48,26,54),f'small{n}.png')
-  line=Image.new('L',(24,3),0);ImageDraw.Draw(line).line((0,1,23,1),fill=190,width=2);save(line,'date-line.png')
+  line=Image.new('L',(64,32),0);ImageDraw.Draw(line).line((20,15,43,15),fill=190,width=2);save(line,'date-line.png')
   for n,t in enumerate(['CN','T2','T3','T4','T5','T6','T7']):save(text(t,29,90,40),f'week{n}.png')
   for pct in range(101):save(text(f'{pct}%',32,90,42),f'power{pct}.png')
   il('Weekday',297,145,90,40,'2012',[f'week{n}.png' for n in range(7)])
-  num('Day',316,203,52,54,'1812','small');image('DateDivider',330,266,24,3,'date-line.png');num('Month',316,279,52,54,'1012','small')
+  num('Day',316,203,52,54,'1812','small');image('DateDivider',310,252,64,32,'date-line.png');num('Month',316,279,52,54,'1012','small')
   il('BatteryPercent',297,364,90,42,'0841',[f'power{n}.png' for n in range(101)])
  def render(hour,minute,day=29,month=10,week=4,pct=59):
   im=ims['black.png'].copy();im.paste(ims[f'hour{hour%12}.png'],(x,34))
@@ -51,7 +51,7 @@ def project(aod=False):
   if not aod:
    im.paste(ims[f'week{week}.png'],(297,145));im.paste(ims[f'power{pct}.png'],(297,364))
    for j,c in enumerate(f'{day:02d}'):im.paste(ims[f'small{c}.png'],(316+j*26,203))
-   im.paste(ims['date-line.png'],(330,266))
+   im.paste(ims['date-line.png'],(310,252))
    for j,c in enumerate(f'{month:02d}'):im.paste(ims[f'small{c}.png'],(316+j*26,279))
   return im
  preview=render(0,0);save(preview.resize((244,298),Image.Resampling.LANCZOS),'preview.png')
